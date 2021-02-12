@@ -22,6 +22,13 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         }
     }
     
+    private var timeOfLastPairChoice: Date?
+    private var scoreTimeMultiplier: Int {
+        guard let timeOfLastPairChoice = timeOfLastPairChoice else { return 1 } // without a multiplier at first
+        let timeInterval = Date().timeIntervalSince(timeOfLastPairChoice)
+        return max(10 - Int(timeInterval.rounded()), 1)
+    }
+    
     mutating func choose(card: Card) {
         print("card chosen: \(card)")
         if let chosenIndex = cards.firstIndex(matching: card), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched {
@@ -29,22 +36,33 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
                 if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                     cards[chosenIndex].isMatched = true
                     cards[potentialMatchIndex].isMatched = true
-                    score += 2
+                    incrementScore()
                 } else {
                     if cards[chosenIndex].isSeen {
-                        score -= 1
+                        decrementScore()
                     }
                     if cards[potentialMatchIndex].isSeen {
-                        score -= 1
+                        decrementScore()
                     }
                 }
                 cards[chosenIndex].isFaceUp.toggle()
                 cards[chosenIndex].isSeen = true
                 cards[potentialMatchIndex].isSeen = true
+                timeOfLastPairChoice = Date()
             } else {
                 indexOfTheOneAndOnlyFaceUpCard = chosenIndex
             }
         }
+    }
+    
+    private mutating func incrementScore() {
+        score += 2 * scoreTimeMultiplier
+        print("Score time multiplier = \(scoreTimeMultiplier)")
+    }
+    
+    private mutating func decrementScore() {
+        score -= 1 * scoreTimeMultiplier
+        print("Score time multiplier = \(scoreTimeMultiplier)")
     }
         
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
