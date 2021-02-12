@@ -14,7 +14,7 @@ struct EmojiMemoryGameView: View {
         NavigationView {
             VStack {
                 Grid(viewModel.cards) { card in
-                    CardView(card: card).onTapGesture {
+                    CardView(card: card, fillGradient: viewModel.fillGradient).onTapGesture {
                         viewModel.choose(card: card)
                     }
                     .padding(5)
@@ -23,7 +23,7 @@ struct EmojiMemoryGameView: View {
                     .padding()
             }
             .padding()
-            .foregroundColor(viewModel.themeColor)
+            .foregroundColor(viewModel.foregroundColor)
             .navigationBarTitle(viewModel.themeName)
             .navigationBarItems(trailing: Button("New Game") {
                 viewModel.newGame()
@@ -34,6 +34,7 @@ struct EmojiMemoryGameView: View {
 
 struct CardView: View {
     var card: MemoryGame<String>.Card
+    var fillGradient: LinearGradient?
     
     var body: some View {
         GeometryReader { geometry in
@@ -44,7 +45,11 @@ struct CardView: View {
                     Text(card.content)
                 } else {
                     if !card.isMatched {
-                        RoundedRectangle(cornerRadius: cornerRadius).fill()
+                        if let fillGradient = fillGradient {
+                            RoundedRectangle(cornerRadius: cornerRadius).fill(fillGradient)
+                        } else {
+                            RoundedRectangle(cornerRadius: cornerRadius).fill()
+                        }
                     }
                 }
             }
