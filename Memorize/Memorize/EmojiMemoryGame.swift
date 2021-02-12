@@ -21,7 +21,7 @@ class EmojiMemoryGame: ObservableObject {
         Theme(name: "Transport", emojis: ["🚗", "✈️", "🚲", "⛵️", "🚌", "🚁", "🚀", "🛸", "🚇"], numberOfPairsOfCards: 5, foregroundColor: .red, fillGradient: nil),
     ]
     
-    static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
+    private static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
         let emojis = theme.emojis.shuffled()
         let numberOfPairsOfCards = theme.numberOfPairsOfCards ?? Int.random(in: 2...theme.emojis.count)
         return MemoryGame<String>(numberOfPairsOfCards: numberOfPairsOfCards) { pairIndex in
