@@ -14,7 +14,7 @@ struct EmojiMemoryGameView: View {
         NavigationView {
             VStack {
                 Grid(viewModel.cards) { card in
-                    CardView(card: card, fillGradient: viewModel.fillGradient).onTapGesture {
+                    CardView(card: card).onTapGesture {
                         viewModel.choose(card: card)
                     }
                     .padding(5)
@@ -34,34 +34,22 @@ struct EmojiMemoryGameView: View {
 
 struct CardView: View {
     var card: MemoryGame<String>.Card
-    var fillGradient: LinearGradient?
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                if card.isFaceUp {
-                    RoundedRectangle(cornerRadius: cornerRadius).fill(Color.white)
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(lineWidth: edgeLineWidth)
+            if card.isFaceUp || !card.isMatched {
+                ZStack {
                     Pie(startAngle: Angle.degrees(0 - 90), endAngle: Angle.degrees(110 - 90), clockwise: true).padding(5).opacity(0.4)
                     Text(card.content)
-                } else {
-                    if !card.isMatched {
-                        if let fillGradient = fillGradient {
-                            RoundedRectangle(cornerRadius: cornerRadius).fill(fillGradient)
-                        } else {
-                            RoundedRectangle(cornerRadius: cornerRadius).fill()
-                        }
-                    }
+                        .font(.system(size: fontSize(for: geometry.size)))
                 }
+                .cardify(isFaceUp: card.isFaceUp)
             }
-            .font(.system(size: fontSize(for: geometry.size)))
         }
     }
     
     // MARK: - Drawing Constants
     
-    private let cornerRadius: CGFloat = 10
-    private let edgeLineWidth: CGFloat = 3
     private let fontScaleFactor: CGFloat = 0.7
     private func fontSize(for size: CGSize) -> CGFloat {
         min(size.width, size.height) * fontScaleFactor
